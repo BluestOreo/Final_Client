@@ -1,0 +1,12 @@
+Python libraries used
+
+numpy
+opencv-python
+pillow
+tkinter
+torch
+scipy
+dlib
+torchvision
+collections
+PIL

@@ -1,0 +1,24 @@
+Install all library dependencies on the requirements file
+
+1.Switch to Code_ directory
+
+2.(Optional)
+Recalibrate the dlib trainer to match your webcam. You will need a chessboard or a printed version of a chessboard. Used  a 10x7 grid board to generate camera_mat.npy file saved in DeepL. Instruction->(https://www.geeksforgeeks.org/camera-calibration-with-python-opencv/)
+
+3.Set up the raspberry pi, connect to network/mobile hotspot. Note IP address.
+
+4. open command line (SSH/ VNC) on the raspberry pi, navigate to cd Freenove_4WD_Smart_Car_Kit_for_Raspberry_Pi/Code/Server,  run main.py using [sudo python main.py -tn] and wait until it updates displaying TCP server open and the IP Address
+
+5. On the main computer(client), open the main.py and update the IP address on line 58 ( self.IP='172.20.10.3' )
+
+6. Run main.py.
+
+7. One window pops up. Press Connect button on bottom left corner. (Updates after about 15s) 
+
+8. One more window pop up, displaying eye tracking information ONLY when a face is detected in frame. Video stream from the pi is also displayed on main window
+
+9. Stare into the direction of desired control{Left, Centre, Right}. Motion is activated after 2-5s of constant gaze in a particular direction.
+
+10. Ensure both power button and actuator buttons are on 
+
+11. Press connect again to attempt reconnection or disconnect button on far left bottom corner to stop and close everything. 
