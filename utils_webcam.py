@@ -108,23 +108,37 @@ def estimate_gaze(img_norm, h_pose_norm, gazenet, device="cpu"):
     return g_vec
 
 ##### 
-## Project and display gaze vector in eye frame
+## Project and display gaze as either a vector or a dot point in eye frame
 #####
-def show_proj_gaze(g_vec_l, g_vec_r, landmarks, img):
+def show_proj_gaze(g_vec_l, g_vec_r, landmarks, img, display_as_dot=False):
     img_show = img.copy()
-    r_e_c = ((landmarks[0] + landmarks[1])/2).astype(int)
-    l_e_c = ((landmarks[2] + landmarks[3])/2).astype(int)
-    g_vec_l = g_vec_l*100
-    g_vec_l[0] *= -1 # img flipped horizontally
-    g_vec_l = g_vec_l.astype(int)
-    g_vec_r = g_vec_r*100 # arbitrary scaling of unit length vector for visualization
-    g_vec_r[0] *= -1 # img flipped horizontally
-    g_vec_r = g_vec_r.astype(int)
-    for i in range(6): # display landmarks
+    # Calculate eye centers for left and right eyes
+    r_eye_center = ((landmarks[0] + landmarks[1]) / 2).astype(int)
+    l_eye_center = ((landmarks[2] + landmarks[3]) / 2).astype(int)
+    
+    # Scale and flip gaze vectors for display
+    g_vec_l = (g_vec_l * 100).astype(int)  # Scale left gaze vector
+    g_vec_l[0] *= -1  # Flip horizontally
+    g_vec_r = (g_vec_r * 100).astype(int)  # Scale right gaze vector
+    g_vec_r[0] *= -1  # Flip horizontally
+    
+    # Display landmarks
+    for i in range(6):
         img_show = cv2.circle(img_show, (landmarks[i][0], landmarks[i][1]), radius=0, color=(0, 0, 255), thickness=2)
-
-    img_show = cv2.line(img_show, (l_e_c[0], l_e_c[1]), (l_e_c[0] + g_vec_l[0], l_e_c[1] + g_vec_l[1]), color=(0, 255, 0), thickness=1)
-    img_show = cv2.line(img_show, (r_e_c[0], r_e_c[1]), (r_e_c[0] + g_vec_r[0], r_e_c[1] + g_vec_r[1]), color=(255, 100, 100), thickness=1)
+    
+    # Show gaze as dot or vector
+    if display_as_dot:
+        # Calculate gaze points for dots
+        dot_point_l = (l_eye_center[0] + g_vec_l[0], l_eye_center[1] + g_vec_l[1])
+        dot_point_r = (r_eye_center[0] + g_vec_r[0], r_eye_center[1] + g_vec_r[1])
+        img_show = cv2.circle(img_show, dot_point_l, radius=3, color=(0, 255, 0), thickness=-1)  # Left eye dot
+        img_show = cv2.circle(img_show, dot_point_r, radius=3, color=(255, 100, 100), thickness=-1)  # Right eye dot
+    else:
+        # Draw gaze vectors as lines
+        img_show = cv2.line(img_show, (l_eye_center[0], l_eye_center[1]), (l_eye_center[0] + g_vec_l[0], l_eye_center[1] + g_vec_l[1]), color=(0, 255, 0), thickness=1)
+        img_show = cv2.line(img_show, (r_eye_center[0], r_eye_center[1]), (r_eye_center[0] + g_vec_r[0], r_eye_center[1] + g_vec_r[1]), color=(255, 100, 100), thickness=1)
+    
+    # Flip and show the image
     img_show = cv2.flip(img_show, 1)
     cv2.imshow("gaze projection", img_show) 
 
@@ -133,7 +147,7 @@ def show_proj_gaze(g_vec_l, g_vec_r, landmarks, img):
 #####
 def show_landmarks(landmarks, img):
     img_show = img.copy()
-    for i in range(6): # display landmarks
+    for i in range(6):  # display landmarks
         img_show = cv2.circle(img_show, (landmarks[i][0], landmarks[i][1]), radius=0, color=(0, 0, 255), thickness=2)
     img_show = cv2.flip(img_show, 1)
     cv2.imshow("face landmarks dlib", img_show)

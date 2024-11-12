@@ -210,7 +210,7 @@ class TorchGazeTracker:
                     if avg_gaze is not None:
                         """gaze_direction = self.classify_gaze_direction(avg_gaze)
                         """
-                        #print(f"Average Gaze Direction: {avg_gaze[0]}")
+                        print(f"Average Gaze Direction: {avg_gaze[0]}")
 
                         if avg_gaze[0] < -0.03:  # Threshold for left #0.07
                             self.gaze_direction=0
@@ -225,7 +225,7 @@ class TorchGazeTracker:
                     start_time = current_time
 
                 # Show the projection of the gaze on the webcam feed
-                show_proj_gaze(g_vec_l, g_vec_r, self.landmarks, img)
+                show_proj_gaze(g_vec_l, g_vec_r, self.landmarks, img,False)
 
             # Break the loop if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -238,7 +238,7 @@ class TorchGazeTracker:
 
 
 if __name__ == '__main__':
-    model_path = "Deep_L/gazenet_g_lenet.pt" #model2.pt" 
+    model_path = "Deep_L/base.pt" #model2.pt" 
     camera_matrix_path = "Deep_L/camera_mat.npy"
     dist_coef_path = None  
 

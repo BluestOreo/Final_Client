@@ -1,4 +1,7 @@
 """
+Manual Control
+
+
 CODE TO RUN AS CLIENT:
 
 This script implements a client interface for controlling a remote wheelchair via a graphical user interface (GUI).
@@ -108,7 +111,7 @@ class ClientWindow:
         self.connect_button = ttk.Button(self.button_frame, text="Video", command=self.vid_stream_btn)
         self.connect_button.pack(side=tk.LEFT, padx=5, pady=10)
 
-        #========Command Handling predefined commands=======
+        #========Message Handling predefined commands=======
         #encode commands to reduce amount of data sent  
         self.Buzzer_ON="BO"
 
@@ -118,8 +121,10 @@ class ClientWindow:
         self.Gyro_Request="GR"
         self.Gyro_Update="GU"
 
-        self.Servo_R="SR"
-        self.Servo_L="SL"
+        self.Servo_H="SH"
+        self.Servo_V="SV"
+
+
         self.Motor_FORWARD="MF"
         self.Motor_STOP="MS"
         self.Motor_LEFT="ML"
@@ -345,7 +350,7 @@ class ClientWindow:
                 self.servo1 = 90
             
             # Send the updated servo position
-            self.TCP.sendData(cmd.CMD_SERVO + self.break_Char + '0' + self.break_Char + str(self.servo1) + self.stop_Char)
+            self.TCP.sendData( self.Servo_H + self.break_Char + str(self.servo1) + self.stop_Char)
             print(f"Servo moved to position {self.servo1}")
 
             #rest variable after use
@@ -368,15 +373,6 @@ class ClientWindow:
 
    
     
-    #===========Ultrasonic Reading Request Function=============
-    def request_Ultrasonic(self):
-        if self.Ultrasonic.text() == "Ultrasonic": # prompt to server to send ultrasonic data
-            self.TCP.sendData(cmd.CMD_SONIC + self.break_Char + '1' + self.stop_Char)
-        else: # once value has been updated to anything but 'ultrasonic' send command to stop sending
-            self.TCP.sendData(cmd.CMD_SONIC + self.break_Char + '0' + self.stop_Char)
-            self.Ultrasonic.setText("Ultrasonic")
-
-    
     #===========Combined Motor Actuation Commands=============
     def update_motor(self):
         print("Received:", self.gaze_tracker.gaze_direction)
@@ -384,7 +380,7 @@ class ClientWindow:
 
         # First send command to stop the motor after 1s of execution of previous loops if any
         try:
-            self.TCP.sendData(self.break_Char + self.Motor_STOP + self.stop_Char)
+            self.TCP.sendData(self.Motor_STOP)
             print("Stop Method executed")
         except Exception as e:
             print("Could NOT send stop message:", e)
@@ -392,15 +388,14 @@ class ClientWindow:
         if command_flag is not None:  # Check if the flag is updated
             if command_flag == 1:  # Move forward
                 try:
-                    self.TCP.sendData(self.break_Char + self.Motor_FORWARD + self.stop_Char)
+                    self.TCP.sendData(self.Motor_FORWARD)
                     print("Sending Forward:", self.Motor_FORWARD)
                 except:
                     print("DIDN'T send:", self.Motor_FORWARD)
 
             elif command_flag == 0:  # Move left
-  
                 try:
-                    self.TCP.sendData(self.break_Char + self.Motor_LEFT + self.stop_Char)                    
+                    self.TCP.sendData(self.Motor_LEFT)                    
                     print("Sending Left:", self.Motor_LEFT)
                 except:
                     print("DIDN'T send:",self.Motor_LEFT)
@@ -408,7 +403,7 @@ class ClientWindow:
             elif command_flag == 3:  # Move right
 
                 try:
-                    self.TCP.sendData(self.break_Char + self.Motor_RIGHT + self.stop_Char)
+                    self.TCP.sendData(self.Motor_RIGHT)
                     print("Sending Right:", self.Motor_RIGHT)
                 except:
                     print("DIDN'T send:",self.Motor_RIGHT)
@@ -418,7 +413,7 @@ class ClientWindow:
         else:
             # If no command is detected, ensure the motor remains in a safe state
             try:
-                self.TCP.sendData(self.break_Char + self.Motor_STOP + self.stop_Char)
+                self.TCP.sendData(self.Motor_STOP)
                 print("Ensuring Stop")
             except:
                 print("Motor Didn't STOP:",self.Motor_STOP )
@@ -435,9 +430,9 @@ class ClientWindow:
         "Send request for actuation or sensing to the server"
         if actuator == self.Buzzer_ON or actuator == self.Gyro_Request or actuator == self.Ultrasonic_Request:
             try:
-                self.TCP.sendData(actuator+ self.break_Char + self.stop_Char)
+                self.TCP.sendData(actuator + self.stop_Char)
             except:
-                print("Error at actuator_handling_CS")
+                print("Error at actuator/sensor send command")
         
 
 
